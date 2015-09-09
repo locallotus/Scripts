@@ -1,0 +1,8 @@
+dig linuxfoundation.org
+# Reverse Lookup:
+dig -x 140.211.169.4
+
+# Show all addresses and mail servers
+host google.com
+# Show addresses
+nslookup google.com

@@ -1,0 +1,36 @@
+# http://www.catonmat.net/blog/linux-socks5-proxy/
+
+You can turn any Linux computer into a SOCKS5 (and SOCKS4) proxy in just one command:
+>ssh -N -D 0.0.0.0:1080 localhost
+
+And it doesn't require root privileges. The ssh command starts up dynamic -D port forwarding on port 1080 and talks to the clients via SOCSK5 or SOCKS4 protocols, just like a regular SOCKS5 proxy would! The -N option makes sure ssh stays idle and doesn't execute any commands on localhost.
+
+If you also wish the command to go into background as a daemon, then add -f option:
+>ssh -f -N -D 0.0.0.0:1080 localhost
+
+To use it, just make your software use SOCKS5 proxy on your Linux computer's IP, port 1080, and you're done, all your requests now get proxied.
+
+Access control can be implemented via iptables. For example, to allow only people from the ip 1.2.3.4 to use the SOCKS5 proxy, add the following iptables rules:
+>iptables -A INPUT --src 1.2.3.4 -p tcp --dport 1080 -j ACCEPT
+>iptables -A INPUT -p tcp --dport 1080 -j REJECT
+The first rule says, allow anyone from 1.2.3.4 to connect to port 1080, and the other rule says, deny everyone else from connecting to port 1080.
+
+Surely, executing iptables requires root privileges. If you don't have root privileges, and you don't want to leave your proxy open (and you really don't want to do that), you'll have to use some kind of a simple TCP proxy wrapper to do access control.
+
+Here, I wrote one in Perl. It's called tcp-proxy.pl and it uses IO::Socket::INET to abstract sockets, and IO::Select to do connection multiplexing.
+
+See tcp-proxy.pl
+
+To use it, you'll have to make a change to the previous configuration. Instead of running ssh SOCKS5 proxy on 0.0.0.0:1080, you'll need to run it on localhost:55555,
+> ssh -f -N -D 55555 localhost
+After that, run the tcp-proxy.pl,
+>perl tcp-proxy.pl &
+
+The TCP proxy will start listening on 0.0.0.0:1080 and will redirect only the allowed IPs in @allowed_ips list to localhost:55555.
+
+Another possibility is to use another computer instead of your own as exit node. What I mean is you can do the following:
+>ssh -f -N -D 1080 other_host
+>ssh -N -D 1080 localhost -l username
+
+This will set up a SOCKS5 proxy on localhost:1080 but when you use it, ssh will automatically tunnel your requests (encrypted) via other_computer.com. This way you can hide what you're doing on the Internet from anyone who might be sniffing your link. They will see that you're doing something but the traffic will be encrypted so they won't be able to tell what you're doing.
+

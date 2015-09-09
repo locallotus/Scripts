@@ -1,0 +1,6 @@
+program [arguments...] 2>&1 | tee outfile
+
+eg:
+python crawler.py 2>&1 | tee output.log
+
+2>&1 dumps the stderr and stdout streams. tee outfile takes the stream it gets and writes it to the screen and to the file "outfile".

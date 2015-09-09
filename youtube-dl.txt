@@ -1,0 +1,27 @@
+# http://www.tecmint.com/install-youtube-dl-command-line-video-download-tool/
+
+# Install YouTube-DL
+sudo curl https://yt-dl.org/latest/youtube-dl -o /usr/local/bin/youtube-dl
+OR
+sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+
+# set the executable permission
+sudo chmod a+rx /usr/local/bin/youtube-dl
+
+# update YouTube-DL
+youtube-dl -U
+
+# download video
+youtube-dl https://www.youtube.com/watch?v=iRYvuS9OxdA
+
+# list available formats
+youtube-dl --list-formats https://www.youtube.com/watch?v=iRYvuS9OxdA
+
+# download specific format
+youtube-dl -f 18 https://www.youtube.com/watch?v=iRYvuS9OxdA
+
+# To download a list of video files, create a file and place all the YouTube links that you wish to download.
+youtube-dl -a youtube_links.txt
+
+# list all options (help)
+youtube-dl --help

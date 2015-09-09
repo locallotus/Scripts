@@ -1,0 +1,24 @@
+# http://robospatula.blogspot.com/2013/12/man-in-the-middle-attack-arpspoof-sslstrip.html
+
+Enable IP Forwarding
+Most Linux distros do not have IP forwarding enabled by default, and Kali/Backtrack are no exceptions! To allow traffic to flow through our machine, IP forwarding needs to be enabled. Open a terminal and run the following command;
+>echo 1 > /proc/sys/net/ipv4/ip_forward
+or > sysctl net.ipv4.ip_forward=1
+
+Identify Target and Gateway IP Addresses:
+>nmap -sP -T4 192.168.1.1/24
+
+ARP Spoofing
+This is where the meat of the attack takes place. Address Resolution Protocol, or ARP, is what is responsible for mapping IP addresses to MAC addresses. These mappings are stored in an ARP table on each machine connected to the network.
+
+The ARP spoofing attack sends out false information to the machine you're attacking, repeatedly telling it that the gateway IP address has changed. The IP address we give it is that of your machine. So now the victim thinks that you are the gateway, and will send all of it's outgoing traffic to you!
+
+We also need to ARP spoof the gateway as well, to make it think that you are the victim's machine. By doing this attack, you are essentially becoming the Man In The Middle.
+
+To ARP Spoof the victim;
+>arpspoof -i <interface> -t <target IP> <gateway IP>
+
+To ARP Spoof the gateway router;
+>arpspoof -i <interface> -t <gateway IP> <target IP>
+Run these commands in their own separate terminal tabs so that you can flick between them and monitor each one.
+

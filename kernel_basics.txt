@@ -1,0 +1,6 @@
+# https://www.youtube.com/watch?v=rTcnTOXf_jM
+ls /boot
+uname -a
+
+# Every kernel version has corresponding modules (drivers)
+ls /lib/modules

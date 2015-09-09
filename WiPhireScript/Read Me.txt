@@ -1,0 +1,35 @@
+WiPhire - Written by Middle (http://www.hackforums.net/member.php?action=profile&uid=385708)
+
+WiPhire is a Bash script aimed at making all of the standard wireless attacks a lot easier to perform; however that does not mean that you don't need prior knowledge to use this script. I suggest that you read through at least one tutorial on what you are trying to do before doing it.
+
+List of tutorials:
+Crack WEP - http://www.hackforums.net/showthread.php?tid=705135
+Crack WPA - http://www.hackforums.net/showthread.php?tid=687543
+MITM attack - http://www.hackforums.net/showthread.php?tid=697870
+Airbomb - http://www.hackforums.net/showthread.php?tid=428968 (Written by ::§ξmtξ×-p®¡mξÐ::.)
+DNSraep - http://www.hackforums.net/showthread.php?tid=152427 (Written by SilverBandit91)
+
+Requirements:
+This script was written on Backtrack 4 and designed to be used with Backtrack 4. You can try to run it on other OS's but I will not be modfying this for any other OS; you will have to do that yourself. This was also desgined to be used with the Alfa AWUS036H Wireless adapter with the RTL8187 chipset. If you do not have this chipset but another adapter that is compatible with the aircrack-ng suite you will need to put it into monitor mode prior to running the script if you wish to use an option that needs monitor mode enabled. You can do this with 'airmon-ng start <interface>'. Also do note that this script needs to be ran as root.
+
+Programs WiPhire uses:
+- airmon-ng 
+- airodump-ng
+- aireplay-ng
+- aircrack-ng
+- airdrop-ng (Requires directory /pentest/wireless/airdrop-ng/)
+- xterm
+- crunch (Requires directory /pentest/passwords/crunch)
+- pyrit
+- sslstrip
+- arpspoof
+- macchanger
+- kate
+- apache2 (Requires directory /etc/init.d/apache2)
+- ettercap
+- firefox (Trivial)
+
+Usage:
+To use this Bash script (Or any Bash script) You need to take the script and place it somewhere that you can remember. For this example i will just use /root/. Now if you are root and you have the script on your desktop, open up a terminal and type ./WiPhire. This will now run the script. If you get a permissions error you will need to change the permissions to make the script executable 'chmod 777 ./WiPhire' This will now allow you to run it. If the script is stored in a different location you need to change the directory to the location before running the script. For example if the script was in a folder called 'scripts' on roots desktop we would run 'cd /root/scripts/' Then we could run './WiPhire'
+
+Thank you for using WiPhire, please support WiPhire here: http://www.hackforums.net/showthread.php?tid=820019

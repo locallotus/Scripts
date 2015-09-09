@@ -1,0 +1,39 @@
+http://www.slashroot.in/network-traffic-analysis-linux-tools
+
+tcpdump -s0 -i any -w traffic.pcap
+
+Using the above tcpdump command i have used -s0 option to capture the full packet size, -i is used for capture from all interfaces, and with -w i have asked tcpdump command to write the output to a file called traffic.pcap, which can be later read by pcap tools.
+
+tcpdump -nn -r traffic.pcap | head
+Using the above command i have read the content of the traffic.pcap file which we have captured, and redirected the output of that command to "head" command.
+
+Now lets understand the output of the tcpdump command. The tcpdump command output consists of four fields to note.
+
+The first filed shows the timestamp.
+Second field in tcpdump shows the protocol
+The third field shows the source IP and also the source port. Its in the form source ip.source port
+the fourth field shows the destination ip and destination port. This is also shown the same way as destination ip.destination port
+
+We will cut out the source ip, from rest of the output using "cut" command in Linux.
+tcpdump -nn -r traffic.pcap | cut -f 3 -d " " | head
+But the above command result consists of the source port also, which need to remove from the output and find the source ip's sending traffic. And then we need to sort those source ip's in count.
+tcpdump -nn -r traffic.pcap | cut -f 3 -d " " | cut -f 1-4 -d "." | sort | uniq -c | sort -n
+Now if you want to organize only the output of "TCP & UDP" then you can do that with the following command.
+tcpdump -nn -r traffic.pcap -p 'tcp or udp'| cut -f 3 -d " " | cut -f 1-4 -d "." | sort | uniq -c | sort -n
+You can also sort the destination ports with the same set of commands as shown below.
+tcpdump -nn -r traffic.pcap -p 'tcp or udp'| cut -f 5 -d " " | cut -f 5 -d "." | sort | uniq -c | sort -n
+Sort the source port as shown below.
+tcpdump -nn -r traffic.pcap -p 'tcp or udp'| cut -f 3 -d " " | cut -f 5 -d "." | sort | uniq -c | sort -n
+
+In the above shown example i needed only the third field in the output, which is the source ip field, so field three 3rd field is sorted out with -f option in cut command. Now we need that third field till there is an adjacent space in the third field. So for that we have used -d " " option.
+
+Now lets ask tcpdump to read the payload and report us the content. I will be listing the unencrypted ftp port 21 and we will see whats going on inside.
+tcpdump -Ann -r traffic.pcap 'dst port 25 or dst port 21' | head -20
+
+Now lets check the output of all http traffic using tcpdump from our captured file traffic.pcap.
+tcpdump -Ann -r traffic.pcap 'dst port 80' | head
+
+Like for example you can get all the user agents using the same above command from http traffic. And also sort it to find the no of requests from various browsers as shown below.
+tcpdump -Ann -r traffic.pcap 'port 80' | grep -Ei 'user-agent' | head -10
+Now lets sort that user agent output so that we can find which browser is taking the highest request.
+tcpdump -Ann -r traffic.pcap 'port 80' | grep -Ei 'user-agent' | sort | uniq -c | sort -n

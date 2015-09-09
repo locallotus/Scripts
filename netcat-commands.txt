@@ -1,0 +1,7 @@
+# https://www.digitalocean.com/community/tutorials/how-to-use-netcat-to-establish-and-test-tcp-and-udp-connections-on-a-vps
+
+nc is alias for netcat
+
+nc -v -z 127.0.0.1 1122 # netcat test connection
+
+nc -vv -u -l -p 8787 # very verbose, udp mode, listen, port

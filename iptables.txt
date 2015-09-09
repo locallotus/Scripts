@@ -1,0 +1,56 @@
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-iptables-on-ubuntu-14-04
+# https://help.ubuntu.com/community/IptablesHowTo
+# http://www.netfilter.org/documentation/HOWTO/packet-filtering-HOWTO.html
+# https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/4/html/Security_Guide/s1-firewall-ipt-fwd.html
+
+iptables -S
+iptables -L
+iftables -F # flush rules
+
+#IPtables settings need to be set-up at each boot (they are not saved automatically), with the following commands:
+Save the iptables:
+sudo iptables-save | sudo tee /etc/iptables.sav
+Edit /etc/rc.local and add the following lines before the "exit 0" line:
+iptables-restore < /etc/iptables.sav
+
+#Enable routing, the kernel does not forward packets by default
+Configure the gateway for routing between two interfaces by enabling IP forwarding:
+sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
+
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# -A INPUT: The -A flag appends a rule to the end of a chain. This is the portion of the command that tells iptables that we wish to add a new rule, that we want that rule added to the end of the chain, and that the chain we want to operate on is the INPUT chain.
+# -m conntrack: iptables has a set of core functionality, but also has a set of extensions or modules that provide extra capabilities.
+# --ctstate: This is one of the commands made available by calling the conntrack module. This command allows us to match packets based on how they are related to packets we've seen before.
+# -j ACCEPT: This specifies the target of matching packets.
+
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+iptables -I INPUT 1 -i lo -j ACCEPT # programs often communicate via loopback interface
+# -I INPUT 1: The -I flag tells iptables to insert a rule. This is different than the -A flag which appends a rule to the end. The -I flag takes a chain and the rule position where you want to insert the new rule.
+In this case, we're adding this rule as the very first rule of the INPUT chain. This will bump the rest of the rules down. We want this at the top because it is fundamental and should not be affected by subsequent rules.
+# -i lo: This component of the rule matches if the interface that the packet is using is the "lo" interface. The "lo" interface is another name for the loopback device. This means that any packet using that interface to communicate (packets generated on our server, for our server) should be accepted.
+
+iptables -P INPUT DROP # change default policy on input chain to drop packets that don't match any rule
+# This will catch any packets that fall through our INPUT chain, and drop them. This is what we call a default drop policy. One of the implications of this type of a design is that it falls back on dropping packets if the rules are flushed.
+This may be more secure, but also can have serious consequences if you don't have another way of accessing your server.
+
+# To insert a rule at line number 4, you could type:
+iptables -I INPUT 4 new_rule_here
+# you can tell iptables to number the rules by typing:
+iptables -L --line-numbers
+
+# By default, the rules that you add to iptables are ephemeral. This means that when you restart your server, your iptables rules will be gone.
+
+This is actually a feature for some user because it gives them an avenue to get back in if they have accidentally locked themselves out of the server. However, most users will want a way to automatically save the rules you have created and to load them when the server starts.
+
+There are a few ways to do this, but the easiest way is with the iptables-persistent package. You can download this from Ubuntu's default repositories:
+apt-get install iptables-persistent
+
+Once the installation is complete, you will have a new service called iptables-persistent that is configured to run at boot. This service will load in your rules and apply them when the server is started.
+
+If you ever update your firewall and want to preserve the changes, you must save your iptables rules for them to be persistent.
+
+Save your firewall rules with this command:
+invoke-rc.d iptables-persistent save

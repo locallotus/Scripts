@@ -1,0 +1,15 @@
+# https://www.lisenet.com/2014/install-and-configure-squid3-caching-proxy-on-debian-wheezy/
+# https://funnybutnot.wordpress.com/2011/12/09/setting-up-a-squid-caching-proxy/
+# http://wiki.squid-cache.org/SquidFaq/ConfiguringSquid
+# https://forum.pfsense.org/index.php?topic=68445.0
+
+Port:
+3128 (default)
+Restart:
+sudo service squid3 restart
+Config:
+/etc/squid3/squid.conf
+Logs:
+/var/log/squid3/access.log
+Disk Cache:
+/var/spool/squid3

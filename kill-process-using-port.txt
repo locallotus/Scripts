@@ -1,0 +1,3 @@
+This fuser 8080/tcp will print you PID of process bound on that port.
+
+And fuser -k 8080/tcp will kill that process.

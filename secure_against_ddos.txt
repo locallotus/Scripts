@@ -1,0 +1,15 @@
+
+See DDoS protection using netfilter-iptables.pdf
+
+Default netfilter is in TCP “loose” mode
+– Allow ACK pkts to create new connection
+>sysctl -w net/netfilter/nf_conntrack_tcp_loose=0
+
+Take advantage of state “INVALID”
+– Drop invalid pkts before reaching LISTEN socket
+>iptables -A INPUT -m state --state INVALID -j DROP
+Use -D to delete rule from INPUT chain
+
+Restart iptables:
+>sudo service iptables restart
+>

@@ -1,0 +1,26 @@
+# https://help.ubuntu.com/community/NetworkManager
+
+# All the connection configuration files will be stored here:
+/etc/NetworkManager
+/etc/NetworkManager/system-connections
+
+# Issues
+If it is not managing your network connections, you'll need to comment out the references to all interfaces (except lo) in /etc/network/interfaces to let Network Manager handle them.
+sudo cp /etc/network/interfaces /etc/network/interfaces.bak
+sudo nano /etc/network/interfaces
+
+It should look similar to this when you are done:
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# This is a list of hotpluggable network interfaces.
+# They will be activated automatically by the hotplug subsystem.
+# auto eth1
+
+# iface eth1 inet dhcp
+
+Then reboot and you should be good to go!

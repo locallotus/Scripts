@@ -1,0 +1,34 @@
+Regular scan
+> nmap 10.0.0.0/24
+
+Scan for ports and services on IP:
+> nmap -Pn -sV 10.0.0.2
+
+Scan for only ports:
+> nmap -Pn 10.0.0.2
+
+Scan IP range (ping sweep):
+> nmap -sP 10.0.0.0/24 or >namp -sP 10.0.0.1-10
+Faster (-T4 flag, 0-5):
+> nmap -sP -T4
+
+Intense Scan:
+> nmap -T4 -A -v 10.0.0.1/24
+Intense Scan plus UDP:
+> nmap -sS -sU -T4 -A -v 10.0.0.0/24
+Intense Scan, all TCP ports
+> nmap -p 1-65535 -T4 -A -v 10.0.0.0/24
+Intense Scan, no ping
+> nmap -T4 -A -v -Pn 10.0.0.0/24
+
+Ping Scan
+> nmap -sn 10.0.0.0/24
+
+Slow Comprehensive Scan
+> nmap -sS -sU -T4 -A -v -PE -PP -PS80,443 -PA3389 -PU40125 -PY -g 53 --script "default or (discovery and safe)" 10.0.0.0/24
+
+Check if Port is Open/Closed/Filtered
+> nmap -p T:22 10.0.0.2
+
+Quick Scan, use -F to scan fewer ports, -T4 for fast (1-5)
+nmap -T4 -F 10.0.0.0/24

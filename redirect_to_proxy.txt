@@ -1,0 +1,6 @@
+>sudo iptables -t nat -A PREROUTING -p tcp --destination-port 80 -j REDIRECT --to-port 11180
+
+List current rules:
+>iptables -L
+>iptables -t nat -L
+>iptables -L -v

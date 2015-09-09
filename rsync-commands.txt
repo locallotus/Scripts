@@ -1,0 +1,107 @@
+# https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps
+# http://www.tecmint.com/rsync-local-remote-file-synchronization-commands/
+
+The basic syntax of rsync is very straight forward, and operates in a way that is similar to ssh, scp, and cp.
+>rsync options source destination
+
+Some common options used with rsync commands
+-v : verbose
+-r : copies data recursively (but don’t preserve timestamps and permission while transferring data
+-a : archive mode, archive mode allows copying files recursively and it also preserves symbolic links, file permissions, user & group ownerships and timestamps
+-z : compress file data
+-h : human-readable, output numbers in a human-readable format
+-e : specify remote shell to use
+-n : dry run (make no changes)
+-W : By default rsync syncs changed blocks and bytes only, sync whole file with this write switch
+
+=== LOCAL SYNC ===
+We will create two test directories and some test files with the following commands:
+>cd ~
+>mkdir dir1
+>mkdir dir2
+>touch dir1/file{1..100}
+
+We now have a directory called dir1 with 100 empty files in it.
+>ls dir1
+We also have an empty directory called dir2.
+
+To sync the contents of dir1 to dir2 on the same system, type:
+>rsync -r dir1/ dir2
+
+The -r option means recursive, which is necessary for directory syncing.
+We could also use the -a flag instead:
+>rsync -a dir1/ dir2
+
+The -a option is a combination flag.
+It stands for "archive" and syncs recursively and preserves symbolic links, special and device files, modification times, group, owner, and permissions.
+It is more commonly used than -r and is usually what you want to use.
+
+You may have noticed that there is a trailing slash (/) at the end of the first argument in the above commands:
+This is necessary to mean "the contents of dir1".
+
+Always double-check your arguments before executing an rsync command.
+Rsync provides a method for doing this by passing the -n or --dry-run options. The -v flag (for verbose) is also necessary to get the appropriate output:
+>rsync -anv dir1/ dir2
+
+=== REMOTE SYNC ===
+Syncing to a remote system is trivial if you have SSH access to the remote machine and rsync installed on both sides:
+>rsync -a ~/dir1 username@remote_host:destination_directory
+# for ssh use -e option to specify remote shell
+>rsync -avzhe ssh root@192.168.0.100:/root/install.log /tmp/
+>rsync -avzhe ssh -p remote_port root@192.168.0.100:/root/install.log /tmp/
+To specify the ssh port:
+rsync -rvz -e 'ssh -p 2222' --progress --remove-sent-files ./dir user@host:/path
+
+This is called a "push" operation because it pushes a directory from the local system to a remote system.
+
+The opposite operation is "pull". 
+It is used to sync a remote directory to the local system. 
+If the dir1 were on the remote system instead of our local system, the syntax would be:
+>rsync -a username@remote_host:/home/username/dir1 place_to_sync_on_local_machine
+
+If you are transferring files that have not already been compressed, like text files, 
+you can reduce the network transfer by adding compression with the -z option:
+>rsync -az source destination
+
+The -P flag is very helpful. It combines the flags --progress and --partial. 
+The first of these gives you a progress bar for the transfers and the second allows you to resume interrupted transfers:
+>rsync -azP source destination
+
+If we run the command again, we will get a shorter output, because no changes have been made.
+This illustrates rsync's ability to use modification times to determine if changes have been made.
+We can update the modification time on some of the files and see that rsync intelligently re-copies only the changed files:
+>touch dir1/file{1..10}
+>rsync -azP source destination
+
+In order to keep two directories truly in sync, it is necessary to delete files from the destination directory if they are removed from the source. 
+By default, rsync does not delete anything from the destination directory.
+We can change this behavior with the --delete option. 
+Before using this option, use the --dry-run option and do testing to prevent data loss:
+>rsync -a --delete source destination
+
+If you wish to exclude certain files or directories located inside a directory you are syncing, 
+you can do so by specifying them in a comma-separated list following the --exclude= option:
+>rsync -a --exclude=pattern_to_exclude source destination
+
+If we have specified a pattern to exclude, 
+we can override that exclusion for files that match a different pattern by using the --include= option.
+>rsync -a --exclude=pattern_to_exclude --include=pattern_to_include source destination
+
+You can specify the Max file size to be transferred or sync. You can do it with “–max-size” option. 
+>rsync -avzhe ssh --max-size='200k' /var/lib/rpm/ root@192.168.0.100:/root/tmprpm
+
+Automatically Delete source Files after successful Transfer
+Now, suppose you have a main web server and a data backup server, 
+you created a daily backup and synced it with your backup server, 
+now you don’t want to keep that local copy of backup in your web server.
+This automatic deletion can be done using ‘–remove-source-files‘ option.
+>rsync --remove-source-files -zvh backup.tar /tmp/backups/
+
+You can set the bandwidth limit while transferring data from one machine to another machine with the the help of ‘–bwlimit‘ option. 
+This options helps us to limit I/O bandwidth.
+rsync --bwlimit=100 -avzhe ssh  /var/lib/rpm/  root@192.168.0.100:/root/tmprpm/
+
+By default rsync syncs changed blocks and bytes only, if you want explicitly want to sync whole file then you use ‘-W‘ option with it.
+rsync -zvhW backup.tar /tmp/backups/backup.tar
+
+

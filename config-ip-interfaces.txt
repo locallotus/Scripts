@@ -1,0 +1,84 @@
+# http://linoxide.com/linux-command/use-ip-command-linux/
+
+# show IPs and MACs of interfaces
+sudo ip addr show
+
+# disable networking
+sudo /etc/init.d/networking stop
+# enable networking
+sudo /etc/init.d/networking start
+
+# view interfaces
+ifconfig
+# view wireless interfaces
+iw config
+# bring interface up or down
+sudo ifconfig eth0 <down/up>
+sudo ip link set dev eth0 <up/down>
+# assign a static ip
+sudo ip addr add 192.168.0.1/24 dev eth0
+
+# Configure Routing
+# add default gateway
+sudo ip route add default via 10.0.0.1
+# delete default gateway
+sudo ip route del default
+# Static Routes
+Why you need to add Static routes or Manual routes, because that the traffic must not pass through the default gateway. We need to add Static routes to pass traffic from best way to reach the destination.
+# ADD a static route
+sudo ip route add 10.0.0.0/24 via 192.168.0.1 dev eth0
+sudo route add -net 192.168.2.0 gw 192.168.1.1 netmask 255.255.255.0 dev eth1
+# DELETE a static route
+sudo ip route del 10.0.0.0/24
+sudo route del -net 192.168.2.0 gw 192.168.1.1 netmask 255.255.255.0 dev eth1
+# show routes
+route
+sudo ip route show
+
+# remove all addresses from interface
+sudo ip addr flush dev eth0
+# remove an ip from interface
+sudo ip addr del <ip>/<mask_bits> dev eth0
+
+# make persistent changes, the above does not save the changes for system restart
+sudo vim /etc/network/interfaces
+iface wlan0 inet static
+address 10.0.0.11
+netmask 255.255.255.0
+gateway 10.0.0.2
+dns-nameservers 8.8.8.8
+
+# for persistent static routes
+Open the file /etc/network/interfaces and at the end add the persistence Static routes. IP Addresses may differ in your environment.
+sudo vi /etc/network/interfaces
+Add the following:
+#########{Static Route}###########
+up ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0
+
+# configure dns servers
+sudo vim /etc/resolv.conf
+Modify or enter nameservers as follows:
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+To test:
+host google.com
+dig google.com
+ping google.com
+nslookup google.com
+
+# alternative dns config
+Unless your ICS gateway can also perform DNS, you must manually configure the client with your ISP DNS servers. 
+If you do not know your ISP's DNS servers, you can use OpenDNS servers instead.
+Backup your current /etc/resolve.conf file:
+sudo cp /etc/resolv.conf /etc/resolv.conf.backup
+Open /etc/dhcp3/dhclient.conf with your favorite text editor:
+sudo vim /etc/dhcp3/dhclient.conf
+Search for the line that starts "prepend domain-name-servers", and change it to look like this:
+prepend domain-name-servers 8.8.8.8,8.8.4.4;
+
+# restart networking
+sudo /etc/init.d/networking restart
+
+# internet connection sharing
+See Simple iptables example
+https://help.ubuntu.com/community/Internet/ConnectionSharing
