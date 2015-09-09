@@ -1,0 +1,2 @@
+dd if=/dev/zero of=/dev/[disk device]
+to wipe the whole drive (write a single pass of zeros over everything. Not "secure" but usually good enough), or use a "disk shredder" tool for a secure wipe.
