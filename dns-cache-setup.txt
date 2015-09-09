@@ -1,1 +1,43 @@
 # https://www.digitalocean.com/community/tutorials/how-to-configure-bind-as-a-caching-or-forwarding-dns-server-on-ubuntu-14-04
+
+# http://www.cyberciti.biz/tips/linux-iptables-12-how-to-block-or-open-dnsbind-service-port-53.html
+
+Allow outgoing DNS client request:
+
+Following iptables rules can be added to your shell script.
+
+SERVER_IP is your server ip address
+
+DNS_SERVER stores the nameserver (DNS) IP address provided by ISP or your own name servers.
+
+Following rules are useful when you run single web/smtp server or even DSL/LL/dialup Internet connections:
+
+SERVER_IP="202.54.10.20"
+DNS_SERVER="202.54.1.5 202.54.1.6"
+for ip in $DNS_SERVER
+do
+iptables -A OUTPUT -p udp -s $SERVER_IP --sport 1024:65535 -d $ip --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p udp -s $ip --sport 53 -d $SERVER_IP --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT-p tcp -s $SERVER_IP --sport 1024:65535 -d $ip --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s $ip --sport 53 -d $SERVER_IP --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT
+done
+
+(B) Allow incoming DNS request at port 53:
+
+Use following rules only if you are protecting dedicated DNS server.
+
+SERVER_IP is IP address where BIND(named) is listing on port 53 for incoming DNS queries.
+
+Please note that here I'm not allowing TCP protocol as I don't have secondary DNS server to do zone transfer.
+
+SERVER_IP="0.0.0.0"
+iptables -A INPUT -p udp -s 0/0 --sport 1024:65535 -d $SERVER_IP --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p udp -s $SERVER_IP --sport 53 -d 0/0 --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -p udp -s 0/0 --sport 53 -d $SERVER_IP --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p udp -s $SERVER_IP --sport 53 -d 0/0 --dport 53 -m state --state ESTABLISHED -j ACCEPT
+
+Please note if you have secondary server, add following rules to above rules so that secondary server can do zone transfer from primary DNS server:
+
+DNS2_IP="202.54.10.2"
+iptables -A INPUT -p tcp -s $DNS2_IP --sport 1024:65535 -d $SERVER_IP --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp -s $SERVER_IP --sport 53 -d $DNS2_IP --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT
